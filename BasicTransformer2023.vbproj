@@ -66,6 +66,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WorkSpace\TransformerEncoderDecoder.vb" />
+    <None Include="WorkSpace\14-39-5-VB_NET_Transformer_Encoder_Decoder.md" />
+    <None Include="WorkSpace\model.X" />
     <Compile Include="Neural Network Layers\iNeuralNetwork.vb" />
     <Compile Include="InputEmbeddings\iEmbed.vb" />
     <Compile Include="VectorStorage\MinHash and Locality-Sensitive Hashing %28LSH%29 .vb" />
@@ -86,6 +89,7 @@
     </Compile>
     <Compile Include="PositionalEncoder\iPosition.vb" />
     <Compile Include="Tokenizer\iTokenize.vb" />
+    <None Include="WorkSpace\TrainingData.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

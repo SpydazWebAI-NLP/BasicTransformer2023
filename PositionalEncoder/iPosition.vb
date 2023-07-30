@@ -1,6 +1,6 @@
 Namespace Basic_NLP
 
-    Namespace NLP
+    Namespace PositionalEncoding
         ''' <summary>
         ''' Encoding:
         ''' EncodeTokenStr: Encodes a String token And returns its positional embedding As a list Of doubles.

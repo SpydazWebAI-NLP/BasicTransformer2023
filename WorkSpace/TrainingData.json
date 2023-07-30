@@ -1,0 +1,211 @@
+{
+  "Intents": [
+    {
+      "Name": "greeting",
+      "Samples": [ "hi", "hello", "hey" ]
+    },
+    {
+      "Name": "goodbye",
+      "Samples": [ "bye", "goodbye", "see you" ]
+    },
+    {
+      "Name": "small_talk",
+      "Samples": [ "How are you?", "What's up?", "How's the weather today?", "Tell me a joke" ]
+    },
+    {
+      "Name": "goodbye",
+      "Samples": [ "bye", "goodbye", "see you" ]
+    },
+    {
+      "Name": "substance_abuse_interview",
+      "Samples": [ "start interview", "begin interview" ]
+    },
+    {
+      "Name": "substance_abuse_interview",
+      "Samples": [ "start interview", "begin interview" ]
+    },
+    {
+      "Name": "depression",
+      "Samples": [ "I'm feeling really down lately.", "I don't enjoy the things I used to.", "I'm having trouble sleeping." ]
+    },
+    {
+      "Name": "anxiety",
+      "Samples": [ "I feel constantly worried and on edge.", "I have panic attacks.", "I avoid certain situations." ]
+    },
+    {
+      "Name": "substance_abuse",
+      "Samples": [ "I have been using drugs excessively.", "I can't control my alcohol consumption.", "I need help with addiction." ]
+    },
+    {
+      "Name": "ptsd",
+      "Samples": [ "I keep having flashbacks of a traumatic event.", "I have trouble sleeping due to nightmares.", "I feel constantly on guard." ]
+    }
+  ],
+  "Entities": [
+    {
+      "Name": "Answer",
+      "Values": [ "yes", "no" ]
+    },
+    {
+      "Name": "Mood",
+      "Values": [ "happy", "sad", "angry", "excited", "anxious", "calm" ]
+    },
+    {
+      "Name": "Sentiment",
+      "Values": [ "positive", "negative", "neutral" ]
+    },
+    {
+      "Name": "Emotion",
+      "Values": [ "joy", "fear", "surprise", "disgust", "sadness", "anger" ]
+    },
+    {
+      "Name": "HappyMood",
+      "Values": [ "joyful", "content", "optimistic", "pleased", "satisfied" ]
+    },
+    {
+      "Name": "SadMood",
+      "Values": [ "melancholy", "dejected", "gloomy", "miserable", "heartbroken" ]
+    },
+    {
+      "Name": "AngryMood",
+      "Values": [ "irritated", "furious", "enraged", "indignant", "outraged" ]
+    },
+    {
+      "Name": "ExcitedMood",
+      "Values": [ "thrilled", "eager", "enthusiastic", "energized", "animated" ]
+    },
+    {
+      "Name": "AnxiousMood",
+      "Values": [ "nervous", "apprehensive", "worried", "panicked", "uneasy" ]
+    },
+    {
+      "Name": "CalmMood",
+      "Values": [ "relaxed", "serene", "tranquil", "composed", "peaceful" ]
+    },
+    {
+      "Name": "PositiveSentiment",
+      "Values": [ "happy", "joyful", "optimistic", "excited", "grateful" ]
+    },
+    {
+      "Name": "NegativeSentiment",
+      "Values": [ "sad", "angry", "frustrated", "disappointed", "worried" ]
+    },
+    {
+      "Name": "NeutralSentiment",
+      "Values": [ "indifferent", "neutral", "unbiased", "unaffected", "detached" ]
+    }
+  ],
+  "Slots": [
+    {
+      "IntentName": "depression",
+      "EntityName": "Answer"
+    },
+    {
+      "IntentName": "anxiety",
+      "EntityName": "Answer"
+    },
+    {
+      "IntentName": "substance_abuse",
+      "EntityName": "Answer"
+    },
+    {
+      "IntentName": "ptsd",
+      "EntityName": "Answer"
+    },
+    {
+      "IntentName": "small_talk",
+      "EntityName": "Mood"
+    },
+    {
+      "IntentName": "small_talk",
+      "EntityName": "Sentiment"
+    },
+    {
+      "IntentName": "small_talk",
+      "EntityName": "Emotion"
+    }
+  ],
+  "Interviews": [
+    {
+      "Name": "depression",
+      "Questions": [
+        "Have you been feeling down or depressed?",
+        "Do you often feel hopeless or have thoughts of suicide?",
+        "Have you lost interest in activities you once enjoyed?",
+        "Have you experienced changes in appetite or weight?"
+      ],
+      "PositiveScoreThreshold": 2,
+      "PositiveIndicationMessage": "Based on your answers, it seems that you may be experiencing symptoms of depression. It is recommended to seek professional help for further evaluation and support.",
+      "NegativeIndicationMessage": "Based on your answers, it appears that you may not be experiencing significant symptoms of depression. However, it's important to monitor your mental well-being and seek help if needed."
+    },
+    {
+      "Name": "anxiety",
+      "Questions": [
+        "Do you often feel worried or experience excessive anxiety?",
+        "Do you have difficulty controlling your anxiety?",
+        "Do you frequently experience panic attacks?",
+        "Do you avoid certain situations due to anxiety?"
+      ],
+      "PositiveScoreThreshold": 2,
+      "PositiveIndicationMessage": "Based on your answers, it seems that you may be experiencing symptoms of anxiety. It is recommended to consult with a mental health professional for a comprehensive assessment and appropriate treatment.",
+      "NegativeIndicationMessage": "Based on your answers, it appears that you may not be experiencing significant symptoms of anxiety. However, if your symptoms persist or worsen, it's important to seek professional advice."
+    },
+    {
+      "Name": "substance_abuse",
+      "Questions": [
+        "Have you ever used drugs or alcohol excessively?",
+        "Have you experienced negative consequences due to your substance use?",
+        "Have you tried to cut down or quit but found it difficult?",
+        "Have you ever lied to others about your substance use?",
+        "Have you neglected your responsibilities because of substance use?"
+      ],
+      "PositiveScoreThreshold": 3,
+      "PositiveIndicationMessage": "Based on your answers, it seems that you may have a substance abuse issue. It is highly recommended to seek professional help and support to address your addiction and improve your well-being.",
+      "NegativeIndicationMessage": "Based on your answers, it appears that you may not have significant symptoms of substance abuse. However, it's important to be mindful of your substance use and seek help if you have any concerns."
+    },
+    {
+      "Name": "ptsd",
+      "Questions": [
+        "Have you experienced a traumatic event that causes distress?",
+        "Do you frequently have flashbacks or intrusive memories of the traumatic event?",
+        "Do you experience emotional distress when reminded of the event?",
+        "Do you have trouble sleeping or experience nightmares related to the event?",
+        "Do you feel constantly on guard or easily startled?"
+      ],
+      "PositiveScoreThreshold": 2,
+      "PositiveIndicationMessage": "Based on your answers, it seems that you may be experiencing symptoms of post-traumatic stress disorder (PTSD). It is highly recommended to seek professional help and support to address your trauma-related symptoms.",
+      "NegativeIndicationMessage": "Based on your answers, it appears that you may not be experiencing significant symptoms of PTSD. However, if you continue to experience distressing symptoms, it's important to consult with a mental health professional."
+    }
+  ],
+  "InterviewQuestions": {
+    "depression": [
+      "Have you been feeling down or depressed?",
+      "Do you often feel hopeless or worthless?",
+      "Have you experienced a loss of interest or pleasure in activities?"
+    ],
+    "anxiety": [
+      "Do you frequently feel anxious or on edge?",
+      "Do you experience physical symptoms such as rapid heartbeat or sweating when anxious?",
+      "Do your anxiety symptoms interfere with your daily life?"
+    ],
+    "substance_abuse": [
+      "Have you ever used drugs or alcohol excessively?",
+      "Have you experienced negative consequences due to your substance use?",
+      "Have you tried to cut down or quit but found it difficult?"
+    ],
+    "ptsd": [
+      "Have you experienced a traumatic event that causes distress?",
+      "Do you frequently have flashbacks or intrusive memories of the traumatic event?",
+      "Do you have trouble sleeping or experience nightmares related to the event?"
+    ]
+  },
+  "InterviewStartMessage": "Welcome to the Psychiatric Interview.",
+  "InterviewEndMessage": "Thank you for completing the interview.",
+  "PositiveScoreThreshold": 2,
+  "PositiveIndicationMessage": "Based on your answers, it seems that you may require further evaluation and treatment. Please consult a mental health professional.",
+  "NegativeIndicationMessage": "Based on your answers, it appears that you may not be experiencing significant symptoms. However, it's always a good idea to seek professional advice if you have any concerns.",
+  "ChatbotName": "PsychBot",
+  "GreetingMessage": "Hello! I am PsychBot. How can I assist you today?",
+  "FarewellMessage": "Thank you for chatting with PsychBot. Take care!"
+
+}

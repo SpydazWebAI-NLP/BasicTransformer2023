@@ -1,43 +1,5 @@
-Namespace MinHashAndLSH
-    Module MainModule
-        Sub Main()
-            ' Create an LSHIndex object with 3 hash tables and 2 hash functions per table
-            Dim lshIndex As New LSHIndex(numHashTables:=3, numHashFunctionsPerTable:=2)
+Namespace VectorDataStore
 
-            ' Create some sample articles
-            Dim article1 As New Document("The Art of Baking: Mastering the Perfect Chocolate Cake", 0)
-            Dim article2 As New Document("Exploring Exotic Cuisines: A Culinary Adventure in Southeast Asia", 1)
-            Dim article3 As New Document("Nutrition for Optimal Brain Health: Foods that Boost Cognitive Function", 2)
-            Dim article4 As New Document("The Rise of Artificial Intelligence: A Game-Changer in the Tech World", 3)
-            Dim article5 As New Document("Introduction to Quantum Computing: Unraveling the Power of Qubits", 4)
-
-            ' Add the articles to the LSH index
-            lshIndex.AddDocument(article1)
-            lshIndex.AddDocument(article2)
-            lshIndex.AddDocument(article3)
-            lshIndex.AddDocument(article4)
-            lshIndex.AddDocument(article5)
-
-            ' Create a query article
-            Dim queryArticle As New Document("Delicious Desserts: A Journey Through Sweet Delights", -1)
-
-            ' Find similar articles using LSH
-            Dim similarArticles As List(Of Document) = lshIndex.FindSimilarDocuments(queryArticle)
-
-            ' Display the results
-            Console.WriteLine("Query Article: " & queryArticle.Content)
-            If similarArticles.Count = 0 Then
-                Console.WriteLine("No similar articles found.")
-            Else
-                Console.WriteLine("Similar Articles:")
-                For Each article As Document In similarArticles
-                    Console.WriteLine(article.Content)
-                Next
-            End If
-
-            Console.ReadLine()
-        End Sub
-    End Module
     Public Class LSHIndex
         Private HashTables As List(Of Dictionary(Of Integer, List(Of Document)))
         Private NumHashTables As Integer

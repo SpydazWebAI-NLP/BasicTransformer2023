@@ -1,9 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.IO
 Imports System.Windows.Forms
-Imports BasicTransformer2023.Word2Vectors.Factory
-Imports BasicTransformer2023.Word2Vectors.Models
-Namespace Word2Vectors
+Imports BasicTransformer2023.Embeddings.Factory
+Imports BasicTransformer2023.Embeddings.Models
+Namespace Embeddings
 
     Namespace Factory
         Public MustInherit Class WordEmbeddingsModel

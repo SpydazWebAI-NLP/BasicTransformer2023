@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Text.RegularExpressions
-Namespace Basic_NLP
+Namespace Tokenizer
     Public Module Extensions
         <Runtime.CompilerServices.Extension()>
         Public Function ExtractStringBetween(ByVal value As String, ByVal strStart As String, ByVal strEnd As String) As String
