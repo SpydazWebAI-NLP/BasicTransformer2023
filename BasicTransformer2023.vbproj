@@ -66,9 +66,13 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WorkSpace\TransformerEncoderDecoder.vb" />
-    <None Include="WorkSpace\14-39-5-VB_NET_Transformer_Encoder_Decoder.md" />
-    <None Include="WorkSpace\model.X" />
+    <None Include="BasicTransformer\readme.md" />
+    <None Include="Transformer Model\Readme.md" />
+    <Compile Include="BasicTransformer\BasicTransformer.vb" />
+    <Compile Include="TransformerEncoderDecoder\TransformerEncoderDecoder.vb" />
+    <None Include="WorkSpace\Transformer-AIAN.pdf" />
+    <None Include="WorkSpace\readme.md" />
+    <Compile Include="Transformer Model\Main.vb" />
     <Compile Include="Neural Network Layers\iNeuralNetwork.vb" />
     <Compile Include="InputEmbeddings\iEmbed.vb" />
     <Compile Include="VectorStorage\MinHash and Locality-Sensitive Hashing %28LSH%29 .vb" />

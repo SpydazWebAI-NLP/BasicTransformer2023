@@ -1140,6 +1140,49 @@
                 Return rnd.NextDouble() - 0.5
             End Function
         End Class
+        Public Class TransformerEncoderDecoder
+            Private encoder As TransformerEncoder
+            Private decoder As TransformerEncoder
+
+            Public Sub New(encoder As TransformerEncoder, decoder As TransformerEncoder)
+                Me.encoder = encoder
+                Me.decoder = decoder
+            End Sub
+
+            Public Function SingleForwardPass(inputSequence As List(Of List(Of Double)), targetSequence As List(Of List(Of Double))) As List(Of List(Of Double))
+                ' Forward pass through the encoder
+                Dim encoderOutput As List(Of List(Of Double)) = encoder.Forward(inputSequence)
+
+                ' Forward pass through the decoder with the encoder output and target sequence
+                Dim decoderOutput As List(Of List(Of Double)) = decoder.Forward(encoderOutput)
+
+                ' Return the decoder output
+                Return decoderOutput
+            End Function
+
+
+            Public Function BatchForwardPass(inputBatch As List(Of List(Of List(Of Double))), targetBatch As List(Of List(Of List(Of Double)))) As List(Of List(Of List(Of Double)))
+                Dim batchOutput As New List(Of List(Of List(Of Double)))
+
+                ' Iterate over each input and target sequence in the batch
+                For i As Integer = 0 To inputBatch.Count - 1
+                    Dim inputSequence As List(Of List(Of Double)) = inputBatch(i)
+                    Dim targetSequence As List(Of List(Of Double)) = targetBatch(i)
+
+                    ' Forward pass through the encoder
+                    Dim encoderOutput As List(Of List(Of Double)) = encoder.Forward(inputSequence)
+
+                    ' Forward pass through the decoder with the encoder output and target sequence
+                    Dim decoderOutput As List(Of List(Of Double)) = decoder.Forward(encoderOutput)
+
+                    ' Add the decoder output to the batch output
+                    batchOutput.Add(decoderOutput)
+                Next
+
+                ' Return the batch output
+                Return batchOutput
+            End Function
+        End Class
 
 
         Private D_Model As Integer
@@ -1164,7 +1207,7 @@
                 ' Add residual connection and perform layer normalization again
                 encodedSequence = MathMult.ConcatenateMatrices(encodedSequence, attention, MathMult.ConcatenationType.Vertical)
                 ' Apply layer normalization
-                'Dim layerNorm As New LayerNormalization(hiddenSize)
+                ' Dim layerNorm As New LayerNormalization(hiddenSize)
                 'encodedSequence = layerNorm.Normalize(encodedSequence)
             Next
 

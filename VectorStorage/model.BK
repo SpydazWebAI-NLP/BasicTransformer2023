@@ -35,13 +35,31 @@
             ' Initialize self-attention mask and encoder-decoder attention mask
             ' ... Implement the mask initialization as needed ...
         End Sub
+        Private Sub LayerNormalize(ByRef vector As Double())
+            ' Compute the mean and variance of the vector.
+            Dim mean As Double = vector.Average()
+            Dim variance As Double = vector.Select(Function(x) (x - mean) * (x - mean)).Average()
+
+            ' Normalize the vector.
+            For i As Integer = 0 To vector.Length - 1
+                vector(i) = (vector(i) - mean) / Math.Sqrt(variance + Epsilon)
+            Next
+        End Sub
+        Private Sub AddAndNorm(ByRef decoderOutput As List(Of Double()), ByRef sourceEmbeddings As List(Of Double()))
+            ' Add the output of the decoder and the source embeddings.
+            For i As Integer = 0 To decoderOutput.Count - 1
+                For j As Integer = 0 To decoderOutput(i).Length - 1
+                    decoderOutput(i)(j) += sourceEmbeddings(i)(j)
+                Next
+            Next
+
+            ' Apply layer normalization to the combined output.
+            For i As Integer = 0 To decoderOutput.Count - 1
+                LayerNormalize(decoderOutput(i))
+            Next
+        End Sub
     End Class
-    Public Function Generate(outputSeqLength As Integer, inputSeq As List(Of Integer)) As List(Of Integer)
-        ' ... Implement the sequence generation function ...
-        ' ... This function generates the output sequence based on the input sequence ...
-        ' ... You can use the trained model to predict the next tokens and build the output sequence ...
-        Return New List(Of Integer)()
-    End Function
+
     Public Sub New(embeddingSize As Integer, numEncoderLayers As Integer, numDecoderLayers As Integer,
                    numHeads As Integer, selfAttentionDim As Integer, feedForwardDim As Integer,
                    epsilon As Double, beta1 As Double, beta2 As Double, learningRate As Double, numEpochs As Integer,
@@ -72,15 +90,6 @@
             DecoderLayers.Add(New TransformerLayer(embeddingSize, selfAttentionDim, feedForwardDim, epsilon, numHeads))
         Next
     End Sub
-
-    ' Implement the forward pass of the Transformer model
-    Public Function Forward(encoderInputs As Double()(), decoderInputs As Double()()) As Double()() ' Encoder forward pass Dim encoderOutputs As Double()() = Encoder.Forward(encoderInputs)
-        ' Decoder forward pass
-        Dim decoderOutputs As Double()() = Decoder.Forward(decoderInputs, encoderOutputs)
-
-        ' Return the decoder outputs
-        Return decoderOutputs
-    End Function
 
     ' Layer normalization function
     Private Function LayerNormalization(x As Double()(), epsilon As Double) As Double()()
@@ -163,68 +172,25 @@
         Return maskedInputs
     End Function
 
-    ' Training function with Adam optimizer
-    Public Sub Train(corpus As List(Of List(Of String)))
+    Private Function ConvertToNumericData(ByRef inputText As List(Of List(Of String)), ByRef vocab As Dictionary(Of String, Integer)) As List(Of List(Of Integer))
+        Dim numericData As New List(Of List(Of Integer))
 
-        ' Convert the corpus to numeric data
-        Dim encoderInputs As List(Of List(Of Integer)) = ConvertToNumericData(corpus)
-        Dim decoderInputs As List(Of List(Of Integer)) = ConvertToNumericData(corpus)
-
-        ' Initialize word embeddings randomly
-        For Each word In WordEmbeddings.Vocabulary
-            WordEmbeddings.WordEmbeddings.embeddings.Add(word, Enumerable.Range(0, EmbeddingSize).Select(Function(_i) Rand.NextDouble() - 0.5).ToArray())
-        Next
-
-        ' Training loop
-        For epoch As Integer = 1 To NumEpochs
-            Console.WriteLine($"Training Epoch {epoch}/{NumEpochs}")
-
-            ' Shuffle the training data to avoid learning order biases
-            Dim trainingData As New List(Of (List(Of Integer), List(Of Integer)))()
-            For i As Integer = 0 To encoderInputs.Count - 1
-                trainingData.Add((encoderInputs(i), decoderInputs(i)))
+        For Each sentence In inputText
+            Dim numericSentence As New List(Of Integer)
+            For Each word In sentence
+                If vocab.ContainsKey(word) Then
+                    numericSentence.Add(vocab(word))
+                Else
+                    numericSentence.Add(vocab("<UNK>")) ' Replace unknown words with the <UNK> token.
+                End If
             Next
-            trainingData = trainingData.OrderBy(Function(_item) Rand.Next()).ToList()
-
-            ' Gradient descent for each training pair
-            For Each item In trainingData
-                ' Forward pass
-                Dim encoderOutputs As Double()() = ForwardEncoder(item.Item1)
-                Dim decoderOutputs As Double()() = ForwardDecoder(item.Item2, encoderOutputs)
-
-                ' Backward pass
-                BackwardDecoder(item.Item2, decoderOutputs)
-                BackwardEncoder(item.Item1, encoderOutputs)
-
-                ' Update word embeddings with Adam optimizer
-                For Each word In WordEmbeddings.Vocabulary
-                    Dim embedding As Double() = WordEmbeddings.WordEmbeddings.GetVector(word)
-                    Dim gradient As Double() = gradient(word)
-                    Dim m As Double() = m_dict(word)
-                    Dim v As Double() = v_dict(word)
-
-                    For i As Integer = 0 To EmbeddingSize - 1
-                        m(i) = Beta1 * m(i) + (1 - Beta1) * gradient(i)
-                        v(i) = Beta2 * v(i) + (1 - Beta2) * gradient(i) * gradient(i)
-
-                        Dim mHat As Double = m(i) / (1 - Math.Pow(Beta1, epoch))
-                        Dim vHat As Double = v(i) / (1 - Math.Pow(Beta2, epoch))
-
-                        embedding(i) -= LearningRate * mHat / (Math.Sqrt(vHat) + Epsilon)
-                    Next
-                Next
-            Next
+            numericData.Add(numericSentence)
         Next
 
-        ' Print the learned word embeddings
-        For Each word In WordEmbeddings.Vocabulary
-            Console.WriteLine($"{word}: {String.Join(", ", WordEmbeddings.WordEmbeddings.GetVector(word))}")
-        Next
+        Return numericData
+    End Function
 
-        ' Now you have learned word embeddings for the given vocabulary
-    End Sub
 End Class
-
 Public Class Encoder
     Private ReadOnly NumLayers As Integer
     Private ReadOnly Layers As List(Of EncoderLayer)
@@ -238,14 +204,7 @@ Public Class Encoder
         Next
     End Sub
 
-    ' Implement the forward pass of the encoder stack
-    Public Function Forward(inputs As Double()()) As Double()()
-        Dim encoderStackOutput As Double()() = inputs
-        For i As Integer = 0 To NumLayers - 1
-            encoderStackOutput = Layers(i).Forward(encoderStackOutput)
-        Next
-        Return encoderStackOutput
-    End Function
+
 End Class
 Public Class EncoderLayer
     Private ReadOnly DimModel As Integer
@@ -266,30 +225,8 @@ Public Class EncoderLayer
         FeedForwardNetwork = New TransformerEncoderDecoder.TransformerEncoder.FeedForwardNetwork(DimModel, DimFeedForward)
     End Sub
 
-    ' Implement the forward pass of the encoder layer
-    Public Function Forward(inputs As Double()()) As Double()()
-        ' Multi-Head Attention
-        Dim selfAttentionOutput As Double()() = MultiHeadAttentionLayer.Forward(inputs)
 
-        ' Add and Norm (Residual Connection and Layer Normalization)
-        Dim addAndNormOutput As Double()() = AddAndNorm(inputs, selfAttentionOutput)
 
-        ' Feed-Forward Network
-        Dim feedForwardOutput As Double()() = FeedForwardNetwork.Forward(addAndNormOutput)
-
-        ' Add and Norm (Residual Connection and Layer Normalization)
-        Dim encoderLayerOutput As Double()() = AddAndNorm(addAndNormOutput, feedForwardOutput)
-
-        Return encoderLayerOutput
-    End Function
-
-    ' Residual Connection (Add) and Layer Normalization (Norm)
-    Private Function AddAndNorm(inputs As Double()(), outputs As Double()()) As Double()()
-        ' Implementation of the residual connection and layer normalization
-        ' ...
-        ' You need to implement this part (add and normalize the inputs and outputs)
-        ' ...
-    End Function
 End Class
 Public Class Decoder
     Private ReadOnly NumLayers As Integer
@@ -304,14 +241,7 @@ Public Class Decoder
         Next
     End Sub
 
-    ' Implement the forward pass of the decoder stack
-    Public Function Forward(inputs As Double()(), encoderOutputs As Double()()) As Double()()
-        Dim decoderStackOutput As Double()() = inputs
-        For i As Integer = 0 To NumLayers - 1
-            decoderStackOutput = Layers(i).Forward(decoderStackOutput, encoderOutputs)
-        Next
-        Return decoderStackOutput
-    End Function
+
 End Class
 Public Class DecoderLayer
     Private ReadOnly DimModel As Integer
@@ -334,34 +264,6 @@ Public Class DecoderLayer
         FeedForwardNetwork = New TransformerEncoderDecoder.TransformerEncoder.FeedForwardNetwork(DimModel, DimFeedForward)
     End Sub
 
-    ' Implement the forward pass of the decoder layer
-    Public Function Forward(inputs As Double()(), encoderOutputs As Double()()) As Double()()
-        ' Masked Multi-Head Attention (Self-Attention)
-        Dim selfAttentionOutput As Double()() = MultiHeadAttentionLayer.Forward(inputs, inputs, inputs)
 
-        ' Add and Norm (Residual Connection and Layer Normalization)
-        Dim addAndNormOutput1 As Double()() = AddAndNorm(inputs, selfAttentionOutput)
 
-        ' Multi-Head Attention (Encoder-Decoder Attention)
-        Dim encoderDecoderAttentionOutput As Double()() = EncoderDecoderAttentionLayer.Forward(addAndNormOutput1, encoderOutputs, encoderOutputs)
-
-        ' Add and Norm (Residual Connection and Layer Normalization)
-        Dim addAndNormOutput2 As Double()() = AddAndNorm(addAndNormOutput1, encoderDecoderAttentionOutput)
-
-        ' Feed-Forward Network
-        Dim feedForwardOutput As Double()() = FeedForwardNetwork.Forward(addAndNormOutput2)
-
-        ' Add and Norm (Residual Connection and Layer Normalization)
-        Dim decoderLayerOutput As Double()() = AddAndNorm(addAndNormOutput2, feedForwardOutput)
-
-        Return decoderLayerOutput
-    End Function
-
-    ' Residual Connection (Add) and Layer Normalization (Norm)
-    Private Function AddAndNorm(inputs As Double()(), outputs As Double()()) As Double()()
-        ' Implementation of the residual connection and layer normalization
-        ' ...
-        ' You need to implement this part (add and normalize the inputs and outputs)
-        ' ...
-    End Function
 End Class
