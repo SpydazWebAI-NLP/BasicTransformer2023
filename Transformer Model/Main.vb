@@ -64,6 +64,30 @@ Namespace iTransform
         Private ReadOnly m_dict As New Dictionary(Of String, Double())
         Private ReadOnly v_dict As New Dictionary(Of String, Double())
 
+        Public Structure TrainingDta
+            Dim inputSeq As List(Of List(Of Double))
+            Dim targetSeq As List(Of List(Of Double))
+
+        End Structure
+        Public Sub Train(trainData As TrainingDta, numEpochs As Integer, learningRate As Double)
+            For epoch = 1 To numEpochs
+                Dim totalLoss As Double = 0.0
+
+                ' Forward pass
+                Dim predictions = Forward(trainData.inputSeq)
+
+                ' Calculate loss
+                Dim loss = CrossEntropyLoss.ComputeCrossEntropyLoss(predictions, trainData.targetSeq)
+                totalLoss += loss
+
+                ' Backward pass
+                Dim gradients = CrossEntropyLoss.ComputeGradients(predictions, trainData.targetSeq)
+
+
+                Dim averageLoss As Double = totalLoss / trainData.inputSeq.Count
+                Console.WriteLine($"Epoch {epoch}, Loss: {averageLoss}")
+            Next
+        End Sub
         Public Sub New(embeddingSize As Integer, numEncoderLayers As Integer, numDecoderLayers As Integer,
                    numHeads As Integer, selfAttentionDim As Integer, feedForwardDim As Integer,
                    epsilon As Double, beta1 As Double, beta2 As Double, learningRate As Double, numEpochs As Integer,
@@ -244,7 +268,7 @@ Namespace iTransform
 
         End Function
 
-        Public Function Train(ByRef BatchInput As List(Of List(Of Double)), ByRef BatchTargets As List(Of List(Of Double)))
+        Public Sub Train(ByRef BatchInput As List(Of List(Of Double)), ByRef BatchTargets As List(Of List(Of Double)))
 
 
 
@@ -261,12 +285,27 @@ Namespace iTransform
             Predictions = Lin.Forward(Predictions)
             'SoftMax
             Predictions = MathMult.Softmax(Predictions)
-            Return Predictions
+
             Dim loss = CrossEntropyLoss.ComputeCrossEntropyLoss(Predictions, TargetQuery_V)
+            ' Compute the gradients of the loss with respect to the model's parameters.
+            Dim gradients = CrossEntropyLoss.ComputeGradients(Predictions, BatchTargets)
 
+            ' Calculate and display the average loss for the epoch.
+            Dim averageLoss = loss / BatchInput.Count
 
-            Return Predictions
-        End Function
+        End Sub
+
+        Private Sub UpdateParametersWithGradientDescent(parameters As List(Of List(Of Double)),
+                                                gradients As List(Of List(Of Double)),
+                                                learningRate As Double)
+            ' Perform gradient descent update for each parameter in the model.
+            For i = 0 To parameters.Count - 1
+                For j = 0 To parameters(i).Count - 1
+                    ' Update parameter using the negative gradient direction.
+                    parameters(i)(j) -= learningRate * gradients(i)(j)
+                Next
+            Next
+        End Sub
 
         Public Function Forward(ByRef BatchInput As List(Of List(Of Double))) As List(Of List(Of Double))
 
@@ -823,6 +862,148 @@ Namespace iTransform
 
             Return finalOutput
 
+        End Function
+    End Class
+    Public Class Tril
+        Public Sub Main()
+            Dim matrix(,) As Integer = {{1, 2, 3, 9}, {4, 5, 6, 8}, {7, 8, 9, 9}}
+
+            Dim result(,) As Integer = Tril(matrix)
+
+            Console.WriteLine("Matrix:")
+            PrintMatrix(matrix)
+
+            Console.WriteLine("Tril Result:")
+            PrintMatrix(result)
+            Console.ReadLine()
+        End Sub
+
+
+        Public Shared Function Tril(ByVal matrix(,) As Integer) As Integer(,)
+            Dim rows As Integer = matrix.GetLength(0)
+            Dim cols As Integer = matrix.GetLength(1)
+
+            Dim result(rows - 1, cols - 1) As Integer
+
+            For i As Integer = 0 To rows - 1
+                For j As Integer = 0 To cols - 1
+                    If j <= i Then
+                        result(i, j) = matrix(i, j)
+                    End If
+                Next
+            Next
+
+            Return result
+        End Function
+        Public Shared Function Tril(ByVal matrix(,) As Double) As Double(,)
+            Dim rows As Integer = matrix.GetLength(0)
+            Dim cols As Integer = matrix.GetLength(1)
+
+            Dim result(rows - 1, cols - 1) As Double
+
+            For i As Integer = 0 To rows - 1
+                For j As Integer = 0 To cols - 1
+                    If j <= i Then
+                        result(i, j) = matrix(i, j)
+                    End If
+                Next
+            Next
+
+            Return result
+        End Function
+        Public Shared Function Tril(ByVal matrix As List(Of List(Of Double))) As List(Of List(Of Double))
+            Dim rows As Integer = matrix.Count
+            Dim cols As Integer = matrix(0).Count
+
+            Dim result As New List(Of List(Of Double))
+
+            For i As Integer = 0 To rows - 1
+                For j As Integer = 0 To cols - 1
+                    If j <= i Then
+                        result(i)(j) = matrix(i)(j)
+                    End If
+                Next
+            Next
+
+            Return result
+        End Function
+        Public Shared Sub PrintMatrix(ByVal matrix(,) As Double)
+            Dim rows As Integer = matrix.GetLength(0)
+            Dim cols As Integer = matrix.GetLength(1)
+
+            For i As Integer = 0 To rows - 1
+                For j As Integer = 0 To cols - 1
+                    Console.Write(matrix(i, j) & " ")
+                Next
+                Console.WriteLine()
+            Next
+        End Sub
+        Public Shared Sub PrintMatrix(ByVal matrix(,) As Integer)
+            Dim rows As Integer = matrix.GetLength(0)
+            Dim cols As Integer = matrix.GetLength(1)
+
+            For i As Integer = 0 To rows - 1
+                For j As Integer = 0 To cols - 1
+                    Console.Write(matrix(i, j) & " ")
+                Next
+                Console.WriteLine()
+            Next
+        End Sub
+    End Class
+    Public Class Softmax
+        Public Shared Function Softmax(matrix2 As Integer(,)) As Double(,)
+            Dim numRows As Integer = matrix2.GetLength(0)
+            Dim numColumns As Integer = matrix2.GetLength(1)
+
+            Dim softmaxValues(numRows - 1, numColumns - 1) As Double
+
+            ' Compute softmax values for each row
+            For i As Integer = 0 To numRows - 1
+                Dim rowSum As Double = 0
+
+                ' Compute exponential values and sum of row elements
+                For j As Integer = 0 To numColumns - 1
+                    softmaxValues(i, j) = Math.Sqrt(Math.Exp(matrix2(i, j)))
+                    rowSum += softmaxValues(i, j)
+                Next
+
+                ' Normalize softmax values for the row
+                For j As Integer = 0 To numColumns - 1
+                    softmaxValues(i, j) /= rowSum
+                Next
+            Next
+
+            ' Display the softmax values
+            Console.WriteLine("Calculated:" & vbNewLine)
+            For i As Integer = 0 To numRows - 1
+                For j As Integer = 0 To numColumns - 1
+
+                    Console.Write(softmaxValues(i, j).ToString("0.0000") & " ")
+                Next
+                Console.WriteLine(vbNewLine & "---------------------")
+            Next
+            Return softmaxValues
+        End Function
+        Public Shared Sub Main()
+            Dim input() As Double = {1.0, 2.0, 3.0}
+
+            Dim output() As Double = Softmax(input)
+
+            Console.WriteLine("Input: {0}", String.Join(", ", input))
+            Console.WriteLine("Softmax Output: {0}", String.Join(", ", output))
+            Console.ReadLine()
+        End Sub
+
+        Public Shared Function Softmax(ByVal input() As Double) As Double()
+            Dim maxVal As Double = input.Max()
+
+            Dim exponentiated() As Double = input.Select(Function(x) Math.Exp(x - maxVal)).ToArray()
+
+            Dim sum As Double = exponentiated.Sum()
+
+            Dim softmaxOutput() As Double = exponentiated.Select(Function(x) x / sum).ToArray()
+
+            Return softmaxOutput
         End Function
     End Class
     Public Class ScaledDotProductAttention
